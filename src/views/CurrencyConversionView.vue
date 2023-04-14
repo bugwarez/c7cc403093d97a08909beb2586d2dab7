@@ -1,19 +1,21 @@
 <template>
   <div>
+    <input type="date" v-model="selectedDate" />
     <h1>Select a Currency</h1>
+    <input type="number" v-model="amount" />
     <select v-model="selectedCurrency" ref="currencySelect">
       <option v-for="currency in currencies" :key="currency" :value="currency">
         {{ currency }}
       </option>
     </select>
     <h1>Select Target Currency</h1>
+    <input readonly type="number" v-model="convertedAmount" />
     <select v-model="targetCurrency">
       <option v-for="currency in currencies" :key="currency" :value="currency">
         {{ currency }}
       </option>
     </select>
-    <input type="date" v-model="selectedDate" />
-    <input type="number" v-model="amount" />
+
     <h2>Conversion Results</h2>
     <p v-if="convertedAmount">
       <span>date: {{ selectedDate }}</span>
@@ -66,7 +68,7 @@ export default {
     })
 
     const convertedAmount = computed(() => {
-      return (amount.value * conversionRate.value).toFixed(3)
+      return (conversionRate.value).toFixed(2)
     })
 
     return {
