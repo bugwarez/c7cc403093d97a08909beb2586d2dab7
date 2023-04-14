@@ -12,9 +12,11 @@
         {{ currency }}
       </option>
     </select>
+    <input type="date" v-model="selectedDate" />
     <input type="number" v-model="amount" />
     <h2>Conversion Results</h2>
     <p v-if="convertedAmount">
+      <span>date: {{ selectedDate }}</span>
       {{ amount }} {{ selectedCurrency }} = {{ convertedAmount }} {{ targetCurrency }}
     </p>
     <p v-else>Please enter an amount to convert.</p>
@@ -31,6 +33,7 @@ export default {
     const currencies = ref([])
     const selectedCurrency = ref('TRY')
     const targetCurrency = ref('USD')
+    const selectedDate = ref(new Date().toISOString().slice(0, 10))
     const amount = ref(1)
     const conversionRate = ref(0)
 
@@ -49,7 +52,7 @@ export default {
         .get(
           `${import.meta.env.VITE_API_BASE_URL}/convert?to=${targetCurrency.value}&from=${
             selectedCurrency.value
-          }&amount=${amount.value}`,
+          }&amount=${amount.value}&date=${selectedDate.value}`,
           {
             headers: {
               apikey: import.meta.env.VITE_API_KEY
@@ -71,7 +74,8 @@ export default {
       selectedCurrency,
       targetCurrency,
       amount,
-      convertedAmount
+      convertedAmount,
+      selectedDate
     }
   }
 }
