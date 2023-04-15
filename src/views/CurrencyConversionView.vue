@@ -28,10 +28,12 @@
 <script>
 import { ref, computed, watchEffect } from 'vue'
 import axios from 'axios'
+import { useHistoryStore } from '@/stores/history'
 
 export default {
-  name: 'CurrencyConverter',
+  name: 'CurrencyConversion',
   setup() {
+    const historyStore = useHistoryStore()
     const currencies = ref([])
     const selectedCurrency = ref('TRY')
     const targetCurrency = ref('USD')
@@ -68,16 +70,27 @@ export default {
     })
 
     const convertedAmount = computed(() => {
-      return (conversionRate.value).toFixed(2)
+      // return conversionRate.value.toFixed(2)
+      const result = conversionRate.value.toFixed(2)
+      if (result) {
+        historyStore.addConversion({
+          amount: amount.value,
+          selectedCurrency: selectedCurrency.value,
+          targetCurrency: targetCurrency.value,
+          selectedDate: selectedDate.value,
+          convertedAmount: result
+        })
+      }
+      return result
     })
 
     return {
       currencies,
       selectedCurrency,
       targetCurrency,
+      selectedDate,
       amount,
-      convertedAmount,
-      selectedDate
+      convertedAmount
     }
   }
 }
