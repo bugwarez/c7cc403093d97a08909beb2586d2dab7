@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div style="padding: 25px">
     <form @submit.prevent="handleSubmit">
-      <div>
+      <div style="margin-bottom: 5px">
         <label> Date range: </label>
-        <Calendar dateFormat="yy-mm-dd" v-model="startDate" showIcon />
+        <Calendar style="margin-right: 5px" dateFormat="yy-mm-dd" v-model="startDate" showIcon />
         <Calendar dateFormat="yy-mm-dd" v-model="endDate" showIcon />
       </div>
-      <div>
+      <div style="margin-bottom: 5px">
         <label>Base Currency</label>
         <Dropdown v-model="baseCurrency" :options="currencies" ref="currencySelect">
           <template #option="option">
@@ -14,7 +14,7 @@
           </template>
         </Dropdown>
       </div>
-      <div>
+      <div style="margin-bottom: 5px">
         <label> Target currency: </label>
         <MultiSelect
           :showToggleAll="false"
@@ -31,7 +31,7 @@
 
       <Button type="submit">Submit</Button>
     </form>
-    <div style="display: flex; flex-direction: table-row">
+    <div style="display: flex; flex-direction: table-row; margin-bottom: 5px">
       <div class="card">
         <table v-if="rates">
           <thead>
