@@ -1,33 +1,27 @@
 <template>
-  <div>
+  <div style="padding: 25px">
     <Calendar dateFormat="dd/mm/yy" :maxDate="maxDate" v-model="selectedDate" showIcon />
     <h1>Select a Currency</h1>
-
     <span class="p-input-icon-left">
       <i class="pi pi-money-bill" />
-      <InputText v-model="amount" type="number" placeholder="Amount" />
+      <InputText style="margin-right: 5px" v-model="amount" type="number" placeholder="Amount" />
     </span>
     <Dropdown v-model="selectedCurrency" :options="currencies" ref="currencySelect">
       <template #option="option">
         {{ option.option }}
       </template>
     </Dropdown>
-    <!-- <select v-model="selectedCurrency" ref="currencySelect">
-      <option v-for="currency in currencies" :key="currency" :value="currency">
-        {{ currency }}
-      </option>
-    </select> -->
     <h1>Select Target Currency</h1>
     <span class="p-input-icon-left">
       <i class="pi pi-money-bill" />
-      <InputText readonly v-model="convertedAmount" type="number" placeholder="Amount" />
+      <InputText
+        style="margin-right: 5px"
+        readonly
+        v-model="convertedAmount"
+        type="number"
+        placeholder="Amount"
+      />
     </span>
-    <!-- <input readonly type="number" v-model="convertedAmount" /> -->
-    <!-- <select v-model="targetCurrency">
-      <option v-for="currency in currencies" :key="currency" :value="currency">
-        {{ currency }}
-      </option>
-    </select> -->
     <Dropdown v-model="targetCurrency" :options="currencies">
       <template #option="option">
         {{ option.option }}
@@ -35,8 +29,8 @@
     </Dropdown>
 
     <h2>Conversion Results</h2>
+    <p v-if="convertedAmount">date: {{ selectedDate }}</p>
     <p v-if="convertedAmount">
-      <span>date: {{ selectedDate }}</span>
       {{ amount }} {{ selectedCurrency }} = {{ convertedAmount }} {{ targetCurrency }}
     </p>
     <p v-else>Please enter an amount to convert.</p>

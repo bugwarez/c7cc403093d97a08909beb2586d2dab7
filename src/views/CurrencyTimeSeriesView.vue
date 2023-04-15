@@ -1,40 +1,57 @@
 <template>
   <div>
     <form @submit.prevent="handleSubmit">
-      <label>
-        Base currency:
-        <select v-model="baseCurrency">
-          <option v-for="currency in currencies" :value="currency">{{ currency }}</option>
-        </select>
-      </label>
-      <label>
-        Target currency:
-        <select v-model="targetCurrencies" multiple>
-          <option v-for="currency in currencies" :value="currency">{{ currency }}</option>
-        </select>
-      </label>
-      <label>
-        Date range:
-        <input type="date" v-model="startDate" />
-        <input type="date" v-model="endDate" />
-      </label>
-      <button type="submit">Submit</button>
+      <div>
+        <label> Date range: </label>
+        <Calendar dateFormat="yy-mm-dd" v-model="startDate" showIcon />
+        <Calendar dateFormat="yy-mm-dd" v-model="endDate" showIcon />
+      </div>
+      <div>
+        <label>Base Currency</label>
+        <Dropdown v-model="baseCurrency" :options="currencies" ref="currencySelect">
+          <template #option="option">
+            {{ option.option }}
+          </template>
+        </Dropdown>
+      </div>
+      <div>
+        <label> Target currency: </label>
+        <MultiSelect
+          :showToggleAll="false"
+          v-if="currencies.length"
+          v-model="targetCurrencies"
+          :options="currencies"
+          :placeholder="'Select currencies'"
+        >
+          <template #option="option">
+            {{ option.option }}
+          </template>
+        </MultiSelect>
+      </div>
+
+      <Button type="submit">Submit</Button>
     </form>
-    <table v-if="rates">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th v-for="currency in targetCurrencies">{{ currency }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(rate, date) in rates" :key="date">
-          <td>{{ date }}</td>
-          <td v-for="currency in targetCurrencies">{{ rate[currency] }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <canvas ref="chart"></canvas>
+    <div style="display: flex; flex-direction: table-row">
+      <div class="card">
+        <table v-if="rates">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th v-for="currency in targetCurrencies">{{ currency }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(rate, date) in rates" :key="date">
+              <td>{{ date }}</td>
+              <td v-for="currency in targetCurrencies">{{ rate[currency] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="chart-container" style="height: 40vh; width: 80vw">
+        <canvas ref="chart"></canvas>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -42,37 +59,63 @@
 import axios from 'axios'
 import Chart from 'chart.js/auto'
 
+//Components
+import Calendar from 'primevue/calendar'
+import InputText from 'primevue/inputtext'
+import Dropdown from 'primevue/dropdown'
+import Button from 'primevue/button'
+import MultiSelect from 'primevue/multiselect'
+//!END OF components
+
 export default {
   name: 'CurrencyRatesPage',
+  components: {
+    Calendar,
+    InputText,
+    Dropdown,
+    Button,
+    MultiSelect
+  },
   data() {
     return {
       baseCurrency: 'EUR',
-      targetCurrencies: ['USD'],
+      targetCurrencies: [],
       startDate: '',
       endDate: '',
       currencies: [],
       rates: {}
     }
   },
-  async created() {
-    try {
-      const response = await axios.get('https://api.apilayer.com/exchangerates_data/symbols', {
+  mounted() {
+    axios
+      .get(`${import.meta.env.VITE_API_BASE_URL}/symbols`, {
         headers: {
           apikey: import.meta.env.VITE_API_KEY
         }
       })
-      this.currencies = Object.keys(response.data.symbols)
-      console.log('this.currencies', this.currencies)
-    } catch (error) {
-      console.error(error)
-    }
+      .then((response) => {
+        this.currencies = Object.keys(response.data.symbols).sort()
+      })
+      .catch((error) => {
+        console.error(error)
+      })
   },
   methods: {
     async handleSubmit() {
+      const startDateObject = new Date(this.startDate)
+      const formattedStartDate = `${startDateObject.getFullYear()}-${(
+        startDateObject.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, '0')}-${startDateObject.getDate().toString().padStart(2, '0')}`
+      const endDateObject = new Date(this.endDate)
+      const formattedEndDate = `${endDateObject.getFullYear()}-${(endDateObject.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}-${endDateObject.getDate().toString().padStart(2, '0')}`
       const response = await axios.get('https://api.apilayer.com/exchangerates_data/timeseries', {
         params: {
-          start_date: this.startDate,
-          end_date: this.endDate,
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
           base: this.baseCurrency,
           symbols: this.targetCurrencies.join(',')
         },
