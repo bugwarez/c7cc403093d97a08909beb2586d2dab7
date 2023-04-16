@@ -8,7 +8,7 @@
       <Column field="convertedAmount" header="Converted Amount"></Column>
       <Column field="targetCurrency" header="Target Currency"></Column>
     </DataTable>
-    <button @click="clearHistory">Clear History</button>
+    <Button @click="clearHistory">Clear History</Button>
   </div>
 </template>
 
@@ -17,15 +17,14 @@ import { ref, watchEffect } from 'vue'
 import { useHistoryStore } from '@/stores/history'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import 'primevue/resources/themes/saga-blue/theme.css'
-import 'primevue/resources/primevue.min.css'
-import 'primeicons/primeicons.css'
+import Button from 'primevue/button'
 
 export default {
   name: 'HistoryView',
   components: {
     DataTable,
-    Column
+    Column,
+    Button
   },
   setup() {
     const historyStore = useHistoryStore()

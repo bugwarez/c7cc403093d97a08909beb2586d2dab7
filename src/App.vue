@@ -1,8 +1,8 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import Button from "primevue/button"
-import NavbarComponent from './components/NavbarComponent.vue';
+import Button from 'primevue/button'
+import NavbarComponent from './components/NavbarComponent.vue'
 </script>
 
 <template>
@@ -12,6 +12,4 @@ import NavbarComponent from './components/NavbarComponent.vue';
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
