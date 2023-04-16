@@ -6,7 +6,12 @@
       <i class="pi pi-money-bill" />
       <InputText style="margin-right: 5px" v-model="amount" type="number" placeholder="Amount" />
     </span>
-    <Dropdown v-model="selectedCurrency" :options="currencies" ref="currencySelect">
+    <Dropdown
+      :loading="dropdownLoadingState"
+      v-model="selectedCurrency"
+      :options="currencies"
+      ref="currencySelect"
+    >
       <template #option="option">
         {{ option.option }}
       </template>
@@ -22,7 +27,7 @@
         placeholder="Amount"
       />
     </span>
-    <Dropdown v-model="targetCurrency" :options="currencies">
+    <Dropdown :loading="dropdownLoadingState" v-model="targetCurrency" :options="currencies">
       <template #option="option">
         {{ option.option }}
       </template>
@@ -55,6 +60,7 @@ export default {
     Dropdown
   },
   setup() {
+    const dropdownLoadingState = ref(true)
     const historyStore = useHistoryStore()
     const currencies = ref([])
     const selectedCurrency = ref('TRY')
@@ -76,6 +82,7 @@ export default {
       })
       .then((response) => {
         currencies.value = Object.keys(response.data.symbols).sort()
+        dropdownLoadingState.value = false
       })
     //!At first we switched date format to dd/mm/yyyy but the api expected format in yyyy-mm-dd so we switched back
     const dateString = selectedDate.value
@@ -120,7 +127,8 @@ export default {
       selectedDate,
       amount,
       convertedAmount,
-      maxDate
+      maxDate,
+      dropdownLoadingState
     }
   }
 }

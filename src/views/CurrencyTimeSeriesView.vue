@@ -4,11 +4,22 @@
       <div style="margin-bottom: 5px">
         <label> Date range: </label>
         <Calendar style="margin-right: 5px" dateFormat="yy-mm-dd" v-model="startDate" showIcon />
-        <Calendar dateFormat="yy-mm-dd" v-model="endDate" showIcon />
+        <Calendar
+          :minDate="minStartDate"
+          :maxDate="maxEndDate"
+          dateFormat="yy-mm-dd"
+          v-model="endDate"
+          showIcon
+        />
       </div>
       <div style="margin-bottom: 5px">
         <label>Base Currency</label>
-        <Dropdown v-model="baseCurrency" :options="currencies" ref="currencySelect">
+        <Dropdown
+          :loading="dropdownLoadingState"
+          v-model="baseCurrency"
+          :options="currencies"
+          ref="currencySelect"
+        >
           <template #option="option">
             {{ option.option }}
           </template>
@@ -31,9 +42,9 @@
 
       <Button type="submit">Submit</Button>
     </form>
-    <div style="display: flex; flex-direction: table-row; margin-bottom: 5px">
-      <div class="card">
-        <table v-if="rates">
+    <div style="display: flex; flex-direction: table-row; margin-bottom: 5px; width: 100%">
+      <div class="card" style="width: 100%; margin-top: 20px">
+        <table class="my-table" v-if="rates">
           <thead>
             <tr>
               <th>Date</th>
@@ -65,6 +76,8 @@ import InputText from 'primevue/inputtext'
 import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
 import MultiSelect from 'primevue/multiselect'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 //!END OF components
 
 export default {
@@ -74,16 +87,32 @@ export default {
     InputText,
     Dropdown,
     Button,
-    MultiSelect
+    MultiSelect,
+    DataTable,
+    Column
   },
   data() {
     return {
+      dropdownLoadingState: true,
       baseCurrency: 'EUR',
       targetCurrencies: [],
       startDate: '',
       endDate: '',
       currencies: [],
       rates: {}
+    }
+  },
+  computed: {
+    maxEndDate() {
+      if (!this.startDate) return null
+      const nextMonth = new Date(this.startDate)
+      nextMonth.setMonth(nextMonth.getMonth() + 1)
+      return nextMonth
+    },
+    minStartDate() {
+      const nextDay = new Date(this.startDate)
+      nextDay.setDate(nextDay.getDate() + 1)
+      return nextDay
     }
   },
   mounted() {
@@ -95,6 +124,7 @@ export default {
       })
       .then((response) => {
         this.currencies = Object.keys(response.data.symbols).sort()
+        this.dropdownLoadingState = false
       })
       .catch((error) => {
         console.error(error)
@@ -156,3 +186,34 @@ export default {
   }
 }
 </script>
+<style scoped>
+.my-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+.my-table th,
+.my-table td {
+  padding: 8px;
+  text-align: left;
+  vertical-align: middle;
+  border: 1px solid #ddd;
+}
+
+.my-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.my-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.my-table tbody td {
+  font-weight: bold;
+}
+</style>
